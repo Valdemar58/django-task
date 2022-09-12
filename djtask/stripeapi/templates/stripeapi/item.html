@@ -1,0 +1,29 @@
+{% extends 'stripeapi/base.html' %}
+
+{% block title %}Buy Item {{item.id}}{% endblock title %} 
+
+{% block content %}
+
+    <h1>{{item.name}}</h1>
+    <p>{{item.description}}</p>
+    <p>{{ price|floatformat:2}} RUB</p>
+
+    <button id="buy-button">Buy</button>
+
+    <script type="text/javascript">
+        var stripe = Stripe('{{ STRIPE_PUBLIC_KEY }}');
+        var buyButton = document.getElementById('buy-button');
+        
+        buyButton.addEventListener('click', function() {
+            console.log('clicked')
+          fetch('/buy/{{item.id}}', {method: 'GET'})
+          .then((response) => {return response.json()})
+          .then((session) => {
+            console.log(session)
+            stripe.redirectToCheckout({ sessionId: session.id })
+          });
+
+        });
+    </script>
+
+{% endblock content %} 

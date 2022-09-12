@@ -1,0 +1,30 @@
+{% extends 'stripeapi/base.html' %}
+
+{% block title %}Make Order {{order.id}}{% endblock title %} 
+
+{% block content %}
+    <h1>Order №{{order.id}}</h1>
+    {% for product in products %}
+    
+    <p>{{product.name}} {{ product.price|floatformat:2}} RUB</p>
+    {% endfor %}
+    
+    <button id="buy-button">Buy</button>
+
+    <script type="text/javascript">
+        var stripe = Stripe('{{ STRIPE_PUBLIC_KEY }}');
+        var buyButton = document.getElementById('buy-button');
+        
+        buyButton.addEventListener('click', function() {
+            console.log('clicked')
+          fetch('/make_order/{{order.id}}', {method: 'GET'})
+          .then((response) => {return response.json()})
+          .then((session) => {
+            console.log(session)
+            stripe.redirectToCheckout({ sessionId: session.id })
+          });
+
+        });
+    </script>
+
+{% endblock content %} 
